@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Q1Test {
      public static void main(String[] args) {
 
@@ -62,8 +64,76 @@ public class Q1Test {
           System.out.println();
      } 
 
-      // write your codes here
+     
      public static String verify(String traversal1, String traversal2, String traversal3){
-          return "";
+          String[] traversals = {traversal1, traversal2, traversal3};
+    
+          int[][] assignments = {{0, 1, 2}, {0, 2, 1}, {1, 0, 2}, {1, 2, 0}, {2, 0, 1}, {2, 1, 0}};
+          for (int[] a : assignments) {
+               if (isBstTraversal(traversals[a[0]], traversals[a[1]], traversals[a[2]])) {
+                    String[] labels = new String[3];
+                    labels[a[0]] = "Inorder";
+                    labels[a[1]] = "Preorder";
+                    labels[a[2]] = "Postorder";
+                    return "Traversal 1 - " + labels[0] + ", Traversal 2 - " + labels[1] + ", Traversal 3 - " + labels[2];
+               }
+          }
+          return "Invalid traversals";
+     }
+
+     // rebuild it and compare all three traversals
+     private static boolean isBstTraversal(String inorder, String preorder, String postorder) {
+          Node root = null;
+          for (String value : preorder.split("-")) {
+               root = insert(root, Integer.parseInt(value));
+          }
+          return inorder.equals(traverse(root, "Inorder"))
+                    && preorder.equals(traverse(root, "Preorder"))
+                    && postorder.equals(traverse(root, "Postorder"));
+     }
+
+     private static Node insert(Node root, int value) {
+          if (root == null) {
+               return new Node(value);
+          }
+          if (value < root.value) {
+               root.left = insert(root.left, value);
+          } else {
+               root.right = insert(root.right, value);
+          }
+          return root;
+     }
+
+     private static String traverse(Node root, String order) {
+          List<String> values = new ArrayList<>();
+          walk(root, order, values);
+          return String.join("-", values);
+     }
+
+     private static void walk(Node node, String order, List<String> values) {
+          if (node == null) {
+               return;
+          }
+          if (order.equals("Preorder")) {
+               values.add(String.valueOf(node.value));
+          }
+          walk(node.left, order, values);
+          if (order.equals("Inorder")) {
+               values.add(String.valueOf(node.value));
+          }
+          walk(node.right, order, values);
+          if (order.equals("Postorder")) {
+               values.add(String.valueOf(node.value));
+          }
+     }
+
+     private static class Node {
+          int value;
+          Node left;
+          Node right;
+
+          Node(int value) {
+               this.value = value;
+          }
      }
 }
